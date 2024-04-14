@@ -1,0 +1,67 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ title }}</title>
+        <style>
+            body{
+                margin: 0%;
+                font-family: Lexend;
+            }
+            #nav{
+                padding: 1% 15% 0% 15%;
+                background-color: #333;
+            }
+            #page{
+                padding: 1% 15% 0% 15%;
+            }
+            ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            }
+
+            li {
+            float: left;
+            }
+
+            li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            }
+
+            li a:hover{
+                background-color: #4285F4;
+            }
+
+         
+        </style>
+    </head>
+    <body>
+        <div id="nav">
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'tank' %}">Devices</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li style="float:right"><a class="active" href="#about">About</a></li>
+            </ul>
+        </div>
+        <div id="page">
+            {% block content %}{% endblock content %}
+            <!-- <h1>base</h1> -->
+        </div>
+        <h1 id="app">{{ text }}</h1>
+        <script src="{% static 'main.js' %}"></script>
+        
+    </body>
+</html>
+
+
+<!-- li a:hover:not(.active) {
+    background-color: #111;
+    } -->
