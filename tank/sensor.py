@@ -36,9 +36,8 @@ def client_subscriptions(client):
 def main():
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1,"rpi_client1") #this should be a unique name
 
-    client.on_disconnect = on_disconnect
     client.on_connect = on_connect
-    # client.on_disconnect = on_disconnect
+    client.on_disconnect = on_disconnect
     client.message_callback_add('esp32/sensor1', callback_esp32_sensor1)
     client.message_callback_add('esp32/sensor2', callback_esp32_sensor2)
     client.message_callback_add('rpi/broadcast', callback_rpi_broadcast)
@@ -49,14 +48,14 @@ def main():
     print("......client setup complete............")
 
     while True:
-        time.sleep(10)   
+        time.sleep(4)   
         if (flag_connected != 1):
             print("flag_connected: ",flag_connected)
             print("trying to connect MQTT server..")
             
-# if __name__ == "__main__":
-    # flag_connected = 0
-    # main()
+if __name__ == "__main__":
+    flag_connected = 0
+    main()
     
 import threading
 class sensor_thread(threading.Thread):

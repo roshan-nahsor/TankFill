@@ -84,9 +84,9 @@ class GraphConsumer(AsyncWebsocketConsumer):
 
 # ===========Technology for Noobs https://www.youtube.com/watch?v=32iJlPDNLQY
 
-    async def disconnect(self,close_code):
-        pass
-        await self.disconnect
+    # async def disconnect(self,close_code):
+    #     pass
+    #     await self.disconnect
 
 #-----------found on some forum
     # async def websocket_disconnect(self, event):
