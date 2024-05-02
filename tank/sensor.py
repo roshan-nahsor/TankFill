@@ -2,8 +2,12 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 
-flag_connected = 0
+from .models import Tank
 
+flag_connected = 0
+VALVE=16
+
+FILL=False
 distance=0
 
 def on_connect(client, userdata, flags, rc):
@@ -22,6 +26,24 @@ def callback_esp32_sensor1(client, userdata, msg):
     global distance
     print('ESP sensor1 data: ', msg.payload.decode('utf-8'))
     distance=int(msg.payload.decode('utf-8'))
+    
+    tank=Tank.objects.get(name='Prototype')
+    # print(tank.height)
+    
+    global FILL
+    # print(distance)
+    empty=tank.height-tank.upper_limit
+    to_fill=tank.height-tank.lower_threshold
+    if distance<empty:
+        if FILL!=False:
+            FILL=False
+            print("Tank Full, Valve Closed")
+            # GPIO.output(VALVE, False)
+    elif distance>to_fill:
+        if FILL!=True:
+            FILL=True
+            print("Filling Water, Valve Opened")
+            # GPIO.output(VALVE, True)
 
 def callback_esp32_sensor2(client, userdata, msg):
     print('ESP sensor2 data: ', str(msg.payload.decode('utf-8')))

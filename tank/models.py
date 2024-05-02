@@ -34,6 +34,7 @@ class SensorData(models.Model):
     tank=models.ForeignKey(Tank, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     value = models.IntegerField()
+    tank_status=models.CharField(max_length=30)
     
 class TimeProfile(models.Model):
     time_id=models.ForeignKey(Tank, on_delete=models.CASCADE)

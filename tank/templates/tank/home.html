@@ -8,12 +8,14 @@
 
         socket.onmessage = function(e){
             var djangoData=JSON.parse(e.data);
-            console.log(djangoData);
+            //console.log(djangoData);
+            var water_level={{tank.height}} - djangoData.value
+            console.log(water_level);
         // document.write("reached here");
 
-            var newGraphData=graphData.data.datasets[0].data;
+            var newGraphData= graphData.data.datasets[0].data;
             newGraphData.shift();
-            newGraphData.push(djangoData.value);
+            newGraphData.push(water_level);
             
             graphData.data.datasets[0].data=newGraphData;
             myChart.update();
@@ -37,7 +39,8 @@
     <script>
         const ctx = document.getElementById('myChart');
         //var chart_type=document.getElementById('chartType').value;
-
+        //var graph_height = {{ tank.height }}
+        //console.log("tank height: ",djangoData)
         var graphData={
             type: "bar",
             data: {
@@ -62,12 +65,22 @@
                     data: {
                         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
                         datasets: [{
-                        label: '# of Votes',
+                        label: 'water level in cm',
                         data: [12, 19, 3, 5, 2, 3],
                         borderWidth: 1
                         }]
                     },
-                    options: {}
+                    options: {
+                        scales: {
+                            y: {
+                                suggestedMin: 0, // Set the lower limit of the scale
+                                suggestedMax: {{tank.height}}, // Set the upper limit of the scale
+                                ticks: {
+                                    stepSize: 5 // Set the step size of the scale
+                                }
+                            }
+                        }
+                    }
                 }
                 //console.log("Reached line")
                 
@@ -84,13 +97,21 @@
                     data: {
                         labels: ['Height'],
                         datasets: [{
-                            label: '# of Votes',
+                            label: 'water level in cm',
                             data: [15],
                             borderWidth: 1
                         }]
                     },
                     options: {
-                        //maintainAspectRatio: false
+                        scales: {
+                            y: {
+                                suggestedMin: 0, // Set the lower limit of the scale
+                                suggestedMax: {{tank.height}}, // Set the upper limit of the scale
+                                ticks: {
+                                    stepSize: 5 // Set the step size of the scale
+                                }
+                            }
+                        }
                     }
                 }
                 myChart=new Chart(ctx,graphData);
