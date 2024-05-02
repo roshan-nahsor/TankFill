@@ -51,19 +51,6 @@
             options: {}
         }
 
-        //var lineData={
-        //    type: "line",
-        //    data: {
-        //        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        //        datasets: [{
-        //        label: '# of Votes',
-        //        data: [12, 19, 3, 5, 2, 3],
-        //        borderWidth: 1
-        //        }]
-        //    },
-        //    options: {}
-        //}
-
         let myChart=new Chart(ctx, graphData);
 
         function set_type(chart_type) {
@@ -102,11 +89,52 @@
                             borderWidth: 1
                         }]
                     },
-                    options: {}
+                    options: {
+                        //maintainAspectRatio: false
+                    }
                 }
                 myChart=new Chart(ctx,graphData);
             
             }
         }
     </script>
+
+
+    <div id="fill_settings">
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'tank' %}">Devices</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li style="float:right"><a class="active" href="#about">About</a></li>
+        </ul>
+    </div>
+
+    {% comment %} <h1>Members</h1> {% endcomment %}
+    {% comment %} {% for i in all %}
+        <p>{{i}}</p>
+        {{i.email}}
+    {% endfor %} {% endcomment %}
+    {% comment %} {% for i in tank %}
+        {{i.name}}
+    {% endfor %} {% endcomment %}
+    {{tank.name}}
+    <form action="{% url 'home' %}" method="POST">
+    {% csrf_token %}
+        <table>
+            <tr>
+                <td>Tank Height</td>
+                <td><input type="number" name="height" class="form" placeholder="Vertical size of the Tank" value="{{tank.height}}"></td>
+                <td rowspan=3><input type="submit" class="done-button" value="Done"></td>
+            </tr>
+            <tr>
+                <td>Upper Limit</td>
+                <td><input type="number" name="upper_limit" class="form" placeholder="Fill water upto..." value="{{tank.upper_limit}}"></td>
+            </tr>
+            <tr>
+                <td>Lower Limit</td>
+                <td><input type="number" name="lower_threshold" class="form" placeholder="Start filling when lower than..." value="{{tank.lower_threshold}}"></td>
+            </tr>
+        </table>
+    </form>
+
 {% endblock content %}

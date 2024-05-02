@@ -25,10 +25,17 @@ class Tank(models.Model):
     height=models.IntegerField()
     upper_limit=models.IntegerField()
     lower_threshold=models.IntegerField()
-    fill_type=models.CharField(max_length=20)
-    subscribe_topic=models.CharField(max_length=20)
+    # subscribe_topic=models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.name
     
 class SensorData(models.Model):
     tank=models.ForeignKey(Tank, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     value = models.IntegerField()
+    
+class TimeProfile(models.Model):
+    time_id=models.ForeignKey(Tank, on_delete=models.CASCADE)
+    time_start=models.TimeField()
+    time_end=models.TimeField()
