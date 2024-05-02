@@ -4,14 +4,13 @@ from random import randint
 
 from . import sensor
 # sensor.main()
-
+sensor.sensor_thread().start()
 # print(sensor.distance)
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class GraphConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-        sensor.sensor_thread().start()
         while True:
             await self.send(json.dumps({'value': sensor.distance}))
             await sleep(5)

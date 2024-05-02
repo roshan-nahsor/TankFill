@@ -25,31 +25,88 @@
 
     <h1>HOME</h1>
 
-    <select id="chartType">
+    <select id="chartType" onchange="set_type(this);">
         <option value="bar">Bar</option>
         <option value="line">Line</option>
     </select>
     Graph
     
     <div>
-        <canvas id="myChart"></canvas>
+        <canvas id="myChart" width="800" height="400"></canvas>
     </div>
     <script>
         const ctx = document.getElementById('myChart');
+        //var chart_type=document.getElementById('chartType').value;
 
         var graphData={
-            type: 'line',
+            type: "bar",
             data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                labels: ['Height'],
                 datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                borderWidth: 1
+                    label: '# of Votes',
+                    data: [15],
+                    borderWidth: 1
                 }]
             },
             options: {}
         }
 
-        var myChart=new Chart(ctx, graphData);
+        //var lineData={
+        //    type: "line",
+        //    data: {
+        //        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        //        datasets: [{
+        //        label: '# of Votes',
+        //        data: [12, 19, 3, 5, 2, 3],
+        //        borderWidth: 1
+        //        }]
+        //    },
+        //    options: {}
+        //}
+
+        let myChart=new Chart(ctx, graphData);
+
+        function set_type(chart_type) {
+            //console.log(chart_type.value);
+            myChart.destroy();
+            if(chart_type.value==='line') {
+                graphData={
+                    type: "line",
+                    data: {
+                        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                        datasets: [{
+                        label: '# of Votes',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderWidth: 1
+                        }]
+                    },
+                    options: {}
+                }
+                //console.log("Reached line")
+                
+                //console.log(graphData.type);
+                //graphData.type='line';
+                //console.log(graphData.type);
+
+                myChart=new Chart(ctx,graphData);
+            }
+            if(chart_type.value==='bar') {
+                //console.log("Reached bar")
+                graphData={
+                    type: "bar",
+                    data: {
+                        labels: ['Height'],
+                        datasets: [{
+                            label: '# of Votes',
+                            data: [15],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {}
+                }
+                myChart=new Chart(ctx,graphData);
+            
+            }
+        }
     </script>
 {% endblock content %}
