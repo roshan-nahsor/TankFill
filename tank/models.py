@@ -30,11 +30,30 @@ class Tank(models.Model):
     def __str__(self):
         return self.name
     
+from django.utils import timezone
+
 class SensorData(models.Model):
     tank=models.ForeignKey(Tank, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     value = models.IntegerField()
-    tank_status=models.CharField(max_length=30)
+    tank_status=models.CharField(max_length=30, null=True)
+    
+    def __str__(self):
+        # return self.timestamp
+        # return self.timestamp.astimezone(timezone.get_current_timezone()).strftime("%Y-%m-%d %H:%M:%S")
+        timestamp_local = self.timestamp.astimezone(timezone.get_current_timezone())
+        
+        # Get the day with ordinal suffix
+        day = timestamp_local.strftime("%d")
+        if 4 <= int(day) <= 20 or 24 <= int(day) <= 30:
+            suffix = "th"
+        else:
+            suffix = ["st", "nd", "rd"][int(day) % 10 - 1]
+
+        # Format the timestamp with the ordinal suffix
+        formatted_timestamp = timestamp_local.strftime(f"%A %B {day}{suffix} %I:%M:%S %p")
+        return formatted_timestamp
+
     
 class TimeProfile(models.Model):
     time_id=models.ForeignKey(Tank, on_delete=models.CASCADE)

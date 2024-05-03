@@ -1,6 +1,6 @@
 from django.shortcuts import render
 # from django.http import HttpResponse
-from .models import Tank
+from .models import Tank, SensorData
 from .forms import TankForm
 
 # Create your views here.
@@ -15,18 +15,21 @@ def home(request):
         if form.is_valid():
             form.save()
         return render(request, 'tank/home.html', {
-            'title': 'Home Page',
+            'title': 'Home',
             # 'all': all_members
             'tank': tank
             })
     
     # all_members=Member.objects.all
     return render(request, 'tank/home.html', {
-        'title': 'Home Page',
+        'title': 'Home',
         # 'all': all_members
         'tank': tank
         })
     
-    
-        
-    
+def logs(request):
+    data=SensorData.objects.all
+    return render(request, 'tank/logs.html', {
+        'title': 'Logs',
+         'data': data
+        })

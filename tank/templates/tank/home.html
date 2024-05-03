@@ -9,15 +9,24 @@
         socket.onmessage = function(e){
             var djangoData=JSON.parse(e.data);
             //console.log(djangoData);
-            var water_level={{tank.height}} - djangoData.value
-            console.log(water_level);
+            var water_level={{tank.height}} - djangoData.value;
+            //console.log(water_level);
+            
         // document.write("reached here");
 
-            var newGraphData= graphData.data.datasets[0].data;
+            var newGraphData=graphData.data.datasets[0].data;
             newGraphData.shift();
             newGraphData.push(water_level);
             
             graphData.data.datasets[0].data=newGraphData;
+
+            var status=djangoData.status;
+            var newStatusData=graphData.data.labels;
+            //console.log(status);
+            newStatusData.shift();
+            newStatusData.push(status);
+            graphData.data.labels=newStatusData;
+
             myChart.update();
 
             //document.querySelector('#app').innerText=djangoData.value;
@@ -46,12 +55,36 @@
             data: {
                 labels: ['Height'],
                 datasets: [{
-                    label: '# of Votes',
+                    label: 'Water Filled',
                     data: [15],
-                    borderWidth: 1
+                    borderWidth: 1,
+                    barPercentage: 0.2
                 }]
             },
-            options: {}
+            options: {
+                scales: {
+                    y: {
+                        suggestedMin: 0, // Set the lower limit of the scale
+                        suggestedMax: {{tank.height}}, // Set the upper limit of the scale
+                        ticks: {
+                            stepSize: 5 // Set the step size of the scale
+                        }
+                    }
+                },
+                animation: {
+                        // Duration of the animation in milliseconds
+                        duration: 200,
+
+                        // Easing function for the animation
+                        easing: 'linear'
+
+                        //from: 0
+
+                        // Callback function that is called when the animation completes
+                        //onComplete: function(animation) {
+                        //console.log('Animation complete');
+                    }
+                }
         }
 
         let myChart=new Chart(ctx, graphData);
@@ -63,10 +96,10 @@
                 graphData={
                     type: "line",
                     data: {
-                        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                        labels: ['none', 'none', 'none', 'none', 'none', 'none'],
                         datasets: [{
                         label: 'water level in cm',
-                        data: [12, 19, 3, 5, 2, 3],
+                        data: [0, 0, 0, 0, 0, 0],
                         borderWidth: 1
                         }]
                     },
@@ -99,7 +132,8 @@
                         datasets: [{
                             label: 'water level in cm',
                             data: [15],
-                            borderWidth: 1
+                            borderWidth: 1,
+                            barPercentage: 0.2
                         }]
                     },
                     options: {
@@ -121,14 +155,13 @@
     </script>
 
 
-    <div id="fill_settings">
+    {% comment %} <div id="fill_settings">
         <ul>
             <li><a href="{% url 'home' %}">Home</a></li>
             <li><a href="{% url 'tank' %}">Devices</a></li>
-            <li><a href="#contact">Contact</a></li>
             <li style="float:right"><a class="active" href="#about">About</a></li>
         </ul>
-    </div>
+    </div> {% endcomment %}
 
     {% comment %} <h1>Members</h1> {% endcomment %}
     {% comment %} {% for i in all %}
