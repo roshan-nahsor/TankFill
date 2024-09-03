@@ -93,9 +93,9 @@ def callback_esp32_sensor1(client, userdata, msg):
             FILL=False
             print("Tank Full, Valve Closed")        
             GPIO.output(VALVE, False)
-            email_alert("Tank Status", "Tank is filled", "crce.9494.ecs@gmail.com")
-            # email_alert("Tank Status", "Tank is filled", "crce.9480.ecs@gmail.com")
-            # email_alert("Tank Status", "Tank is filled", "bhoir@fragnel.edu.in")
+            email_alert("Tank Status", "Tank is filled", "@abc.com")
+            # email_alert("Tank Status", "Tank is filled", "@gmail.com")
+            # email_alert("Tank Status", "Tank is filled", "@xyz.com")
         add_sensor_data(tank.name, (tank.height-distance), 'Full')
         # global tank_status
         
