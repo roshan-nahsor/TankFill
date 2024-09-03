@@ -33,8 +33,8 @@ def email_alert(subject, body, to):
     msg['to']=to
     msg['from']=f"{tank.name} Tank"
 
-    user='roshanb1943@gmail.com'
-    password='jdmi bntn daru ahlm'
+    user='***'
+    password='***'
 
     server=smtplib.SMTP("smtp.gmail.com",587)
     server.starttls()
@@ -106,9 +106,9 @@ def callback_esp32_sensor1(client, userdata, msg):
             FILL=True
             print("Filling Water, Valve Opened")
             GPIO.output(VALVE, True)
-            email_alert("Tank Status", "Tank is filling", "crce.9494.ecs@gmail.com")
-            # email_alert("Tank Status", "Tank is filling", "crce.9480.ecs@gmail.com")
-            # email_alert("Tank Status", "Tank is filling", "bhoir@fragnel.edu.in")
+            email_alert("Tank Status", "Tank is filling", "@abc.com")
+            # email_alert("Tank Status", "Tank is filling", "@gmail.com")
+            # email_alert("Tank Status", "Tank is filling", "@xyz.com")
         add_sensor_data(tank.name, (tank.height-distance), 'Filling')
         # global tank_status
             
