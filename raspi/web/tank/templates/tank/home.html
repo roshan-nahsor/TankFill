@@ -1,5 +1,194 @@
 {% extends "tank/base.html" %}
 
 {% block content %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- graphconsumer -->
+    <script>
+        var socket=new WebSocket('ws://127.0.0.1:8000/ws/tank/');
+
+        socket.onmessage = function(e){
+            var djangoData=JSON.parse(e.data);
+            //console.log(djangoData);
+            var water_level={{tank.height}} - djangoData.value;
+            //console.log(water_level);
+            
+        // document.write("reached here");
+
+            var newGraphData=graphData.data.datasets[0].data;
+            newGraphData.shift();
+            newGraphData.push(water_level);
+            
+            graphData.data.datasets[0].data=newGraphData;
+
+            var status=djangoData.status;
+            var newStatusData=graphData.data.labels;
+            //console.log(status);
+            newStatusData.shift();
+            newStatusData.push(status);
+            graphData.data.labels=newStatusData;
+
+            myChart.update();
+
+            //document.querySelector('#app').innerText=djangoData.value;
+        }
+    </script>
+        
+
     <h1>HOME</h1>
+
+    <select id="chartType" onchange="set_type(this);">
+        <option value="bar">Bar</option>
+        <option value="line">Line</option>
+    </select>
+    Graph
+    
+    <div>
+        <canvas id="myChart" width="800" height="400"></canvas>
+    </div>
+    <script>
+        const ctx = document.getElementById('myChart');
+        //var chart_type=document.getElementById('chartType').value;
+        //var graph_height = {{ tank.height }}
+        //console.log("tank height: ",djangoData)
+        var graphData={
+            type: "bar",
+            data: {
+                labels: ['Height'],
+                datasets: [{
+                    label: 'Water Filled',
+                    data: [15],
+                    borderWidth: 1,
+                    barPercentage: 0.2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        suggestedMin: 0, // Set the lower limit of the scale
+                        suggestedMax: {{tank.height}}, // Set the upper limit of the scale
+                        ticks: {
+                            stepSize: 5 // Set the step size of the scale
+                        }
+                    }
+                },
+                animation: {
+                        // Duration of the animation in milliseconds
+                        duration: 200,
+
+                        // Easing function for the animation
+                        easing: 'linear'
+
+                        //from: 0
+
+                        // Callback function that is called when the animation completes
+                        //onComplete: function(animation) {
+                        //console.log('Animation complete');
+                    }
+                }
+        }
+
+        let myChart=new Chart(ctx, graphData);
+
+        function set_type(chart_type) {
+            //console.log(chart_type.value);
+            myChart.destroy();
+            if(chart_type.value==='line') {
+                graphData={
+                    type: "line",
+                    data: {
+                        labels: ['none', 'none', 'none', 'none', 'none', 'none'],
+                        datasets: [{
+                        label: 'water level in cm',
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                suggestedMin: 0, // Set the lower limit of the scale
+                                suggestedMax: {{tank.height}}, // Set the upper limit of the scale
+                                ticks: {
+                                    stepSize: 5 // Set the step size of the scale
+                                }
+                            }
+                        }
+                    }
+                }
+                //console.log("Reached line")
+                
+                //console.log(graphData.type);
+                //graphData.type='line';
+                //console.log(graphData.type);
+
+                myChart=new Chart(ctx,graphData);
+            }
+            if(chart_type.value==='bar') {
+                //console.log("Reached bar")
+                graphData={
+                    type: "bar",
+                    data: {
+                        labels: ['Height'],
+                        datasets: [{
+                            label: 'water level in cm',
+                            data: [15],
+                            borderWidth: 1,
+                            barPercentage: 0.2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                suggestedMin: 0, // Set the lower limit of the scale
+                                suggestedMax: {{tank.height}}, // Set the upper limit of the scale
+                                ticks: {
+                                    stepSize: 5 // Set the step size of the scale
+                                }
+                            }
+                        }
+                    }
+                }
+                myChart=new Chart(ctx,graphData);
+            
+            }
+        }
+    </script>
+
+
+    {% comment %} <div id="fill_settings">
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'tank' %}">Devices</a></li>
+            <li style="float:right"><a class="active" href="#about">About</a></li>
+        </ul>
+    </div> {% endcomment %}
+
+    {% comment %} <h1>Members</h1> {% endcomment %}
+    {% comment %} {% for i in all %}
+        <p>{{i}}</p>
+        {{i.email}}
+    {% endfor %} {% endcomment %}
+    {% comment %} {% for i in tank %}
+        {{i.name}}
+    {% endfor %} {% endcomment %}
+    {{tank.name}}
+    <form action="{% url 'home' %}" method="POST">
+    {% csrf_token %}
+        <table>
+            <tr>
+                <td>Tank Height</td>
+                <td><input type="number" name="height" class="form" placeholder="Vertical size of the Tank" value="{{tank.height}}"></td>
+                <td rowspan=3><input type="submit" class="done-button" value="Done"></td>
+            </tr>
+            <tr>
+                <td>Upper Limit</td>
+                <td><input type="number" name="upper_limit" class="form" placeholder="Fill water upto..." value="{{tank.upper_limit}}"></td>
+            </tr>
+            <tr>
+                <td>Lower Limit</td>
+                <td><input type="number" name="lower_threshold" class="form" placeholder="Start filling when lower than..." value="{{tank.lower_threshold}}"></td>
+            </tr>
+        </table>
+    </form>
+
 {% endblock content %}

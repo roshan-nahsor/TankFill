@@ -27,10 +27,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# ALLOWED_HOSTS = ['192.168.0.249']
+
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne', #instead of 'channels'
+    # 'mqttasgi',
     'tank.apps.TankConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,8 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels'
-    #'daphne', #instead of 'channels'
+    # 'channels'
 ]
 
 MIDDLEWARE = [
@@ -84,6 +87,14 @@ DATABASES = {
     }
 }
 
+CHANNEL_LAYERS={
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)]
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -109,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Calcutta'
 
 USE_I18N = True
 

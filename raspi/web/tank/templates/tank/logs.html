@@ -1,0 +1,22 @@
+{% extends "tank/base.html" %}
+
+{% block content %}
+    <style>
+        #logs{
+            padding: 0%;
+            width=100%;
+        }
+    </style>
+    <h1>LOGS</h1>
+    <table id=logs>
+    {% for i in data %}
+        <tr>
+            <td>{{i.tank}}</td>
+            <td>{{i.timestamp}}</td>
+            <td>{{i.value}}</td>
+            <td>{{i.tank_status}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    {% comment %} <p>{{data}}</p> {% endcomment %}
+{% endblock content %}
