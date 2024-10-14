@@ -1,5 +1,7 @@
 import paho.mqtt.client as mqtt
-import time
+import paho.mqtt.subscribe as subscribe
+import paho.mqtt.publish as publish
+import time, json
 import datetime
 
 from .models import Tank,SensorData
@@ -13,16 +15,12 @@ import time,os
 # import datetime
 
 flag_connected = 0
-VALVE=16
+status="none"
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(VALVE,GPIO.OUT)
-GPIO.output(VALVE, False)
+tank_status=old_ts=2
 
-tank_status='none'
-
-FILL=False
-distance=0
+# FILL=False
+# distance=0
 
 def email_alert(subject, body, to):
     tank = Tank.objects.get(name='Prototype')
@@ -42,7 +40,48 @@ def email_alert(subject, body, to):
     server.send_message(msg)
     server.quit()
 
+def on_subscribe(client, userdata, mid, reason_code_list, properties):
+    # Since we subscribed only for a single channel, reason_code_list contains
+    # a single entry
+    if reason_code_list[0].is_failure:
+        print(f"Broker rejected you subscription: {reason_code_list[0]}")
+    else:
+        print(f"Broker granted the following QoS: {reason_code_list[0].value}")
 
+def status_decoder(value):
+    cases = {
+        0: "Neutral",
+        1: 'Filling',
+        2: 'Full'
+    }
+    return cases.get(value)
+
+def on_message(client, userdata, message):
+    global water_level, tank_status, old_ts, status
+    tank=Tank.objects.get(name='Prototype')
+    # print("%s %s" %(message.topic, message.payload.decode("utf-8")))
+    msg=message.payload.decode("utf-8")
+    if(message.topic=="esp32/tank"):
+        tank_json_object = json.loads(msg)
+        water_level=tank_json_object['wl']
+        tank_status=tank_json_object['ts']
+        # print("wl= ",tank_json_object['wl'])
+        # print("ts= ",tank_json_object['ts'])
+        status=status_decoder(int(tank_status))
+        add_sensor_data(tank.name, water_level, status)
+    
+    if old_ts!=tank_status and tank_status!=0:
+        old_ts=tank_status
+        print("send email")
+        
+    
+def on_connect(client, userdata, flags, reason_code, properties):
+    if reason_code.is_failure:
+        print(f"Failed to connect: {reason_code}. loop_forever() will retry connection")
+    else:
+        # we should always subscribe from on_connect callback to be sure
+        # our subscribed is persisted across reconnections.
+        client.subscribe("esp32/#")
 
 def add_sensor_data(tank_name, sensor_value, status):
     # Get the tank object
@@ -53,18 +92,6 @@ def add_sensor_data(tank_name, sensor_value, status):
     
     # Save the SensorData instance
     sensor_data.save()
-
-
-def on_connect(client, userdata, flags, rc):
-   global flag_connected
-   flag_connected = 1
-   client_subscriptions(client)
-   print("Connected to MQTT server")
-
-def on_disconnect(client, userdata, rc):
-   global flag_connected
-   flag_connected = 0
-   print("Disconnected from MQTT server")
    
 # a callback functions 
 def callback_esp32_sensor1(client, userdata, msg):
@@ -77,16 +104,6 @@ def callback_esp32_sensor1(client, userdata, msg):
     
     global FILL
     global tank_status
-    # print(distance)
-    empty=tank.height-tank.upper_limit
-    to_fill=tank.height-tank.lower_threshold
-    print(tank.height-distance)
-    # print("tank.height",tank.height)
-    # print("tank.upper_limit",tank.upper_limit)
-    # print("tank.lower_threshold",tank.lower_threshold)
-        
-    # print("empty",empty,"to_fill",to_fill)
-    
     if distance<=empty:
         tank_status='Full'
         if FILL!=False:
@@ -117,36 +134,47 @@ def callback_esp32_sensor1(client, userdata, msg):
         # global tank_status
         tank_status='Neutral'
             
-
-def callback_esp32_sensor2(client, userdata, msg):
-    print('ESP sensor2 data: ', str(msg.payload.decode('utf-8')))
-
-def callback_rpi_broadcast(client, userdata, msg):
-    print('RPi Broadcast message:  ', str(msg.payload.decode('utf-8')))
-
-def client_subscriptions(client):
-    client.subscribe("esp32/#")
-    client.subscribe("rpi/broadcast")
+# def client_subscriptions(client):
+#     client.subscribe("esp32/#")
+#     client.subscribe("rpi/broadcast")
 
 def main():    
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1,"rpi_client1") #this should be a unique name
+    # client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1,"rpi_client1") #this should be a unique name
 
-    client.on_connect = on_connect
-    client.on_disconnect = on_disconnect
-    client.message_callback_add('esp32/sensor1', callback_esp32_sensor1)
-    client.message_callback_add('esp32/sensor2', callback_esp32_sensor2)
-    client.message_callback_add('rpi/broadcast', callback_rpi_broadcast)
-    client.connect('127.0.0.1',1883)
-    # start a new thread
-    client.loop_start()
-    client_subscriptions(client)
-    print("......client setup complete............")
+    # client.on_connect = on_connect
+    # client.on_disconnect = on_disconnect
+    # client.message_callback_add('esp32/sensor1', callback_esp32_sensor1)
+    # client.message_callback_add('esp32/sensor2', callback_esp32_sensor2)
+    # client.message_callback_add('rpi/broadcast', callback_rpi_broadcast)
+    # client.connect('127.0.0.1',1883)
+    # # start a new thread
+    # client.loop_start()
+    # client_subscriptions(client)
+    # print("......client setup complete............")
 
-    while True:
-        time.sleep(4)   
-        if (flag_connected != 1):
-            print("flag_connected: ",flag_connected)
-            print("trying to connect MQTT server..")
+    # while True:
+    #     time.sleep(4)   
+    #     if (flag_connected != 1):
+    #         print("flag_connected: ",flag_connected)
+    #         print("trying to connect MQTT server..")
+    mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+
+    mqttc.on_connect = on_connect
+    # mqttc.on_message = on_message
+    mqttc.on_subscribe = on_subscribe
+    # mqttc.on_unsubscribe = on_unsubscribe
+
+    # mqttc.user_data_set([])
+    mqttc.connect("127.0.0.1",1883)
+
+    # subscribe.callback(on_message, "esp32/#", hostname="127.0.0.1", port=1883) #, userdata={"message_count": 0})
+
+    mqttc.message_callback_add("esp32/#", on_message)
+    mqttc.loop_start()
+
+    print("after callback")
+
+
             
 if __name__ == "__main__":
     flag_connected = 0

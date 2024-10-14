@@ -12,7 +12,7 @@ class GraphConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
         while True:
-            await self.send(json.dumps({'value': sensor.distance,'status': sensor.tank_status}))
+            await self.send(json.dumps({'value': sensor.water_level,'status': sensor.status}))
             await sleep(5)
 
 

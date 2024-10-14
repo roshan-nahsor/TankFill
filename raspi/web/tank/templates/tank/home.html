@@ -9,7 +9,8 @@
         socket.onmessage = function(e){
             var djangoData=JSON.parse(e.data);
             //console.log(djangoData);
-            var water_level={{tank.height}} - djangoData.value;
+            {% comment %} var water_level={{tank.height}} - djangoData.value; {% endcomment %}
+            var water_level=djangoData.value;
             //console.log(water_level);
             
         // document.write("reached here");
