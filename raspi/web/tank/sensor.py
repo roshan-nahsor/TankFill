@@ -32,8 +32,8 @@ def email_alert(subject, body, to):
     msg['to']=to
     msg['from']=f"{tank.name} Tank"
 
-    user='roshanb1943@gmail.com'
-    password='jdmi bntn daru ahlm'
+    # user='email_id@gmail.com'
+    # password='app password'
 
     server=smtplib.SMTP("smtp.gmail.com",587)
     server.starttls()
