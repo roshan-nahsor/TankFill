@@ -56,6 +56,11 @@ class SensorData(models.Model):
 
     
 class TimeProfile(models.Model):
-    time_id=models.ForeignKey(Tank, on_delete=models.CASCADE)
-    time_start=models.TimeField()
-    time_end=models.TimeField()
+    name=models.CharField(max_length=50)
+    is_active = models.BooleanField(default=False)
+    time_start_h=models.IntegerField()
+    time_start_m=models.IntegerField()
+    time_end_h=models.IntegerField()
+    time_end_m=models.IntegerField()
+    def __str__(self):
+        return self.name

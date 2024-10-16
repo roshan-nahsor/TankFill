@@ -11,9 +11,29 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 class GraphConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-        while True:
-            await self.send(json.dumps({'value': sensor.water_level,'status': sensor.status}))
-            await sleep(5)
+        # while True:
+        #     await self.send(json.dumps({'value': sensor.water_level,'status': sensor.status}))
+        #     await sleep(5)
+        
+    # --------------------websocket disconnect--------------------
+        try:
+            while True:
+                # Send sensor data
+                await self.send(json.dumps({
+                    'value': sensor.water_level,
+                    'status': sensor.status
+                }))
+                await sleep(5)
+        except Exception as e:
+            print(f"Error occurred: {e}")
+        finally:
+            await self.close()
+
+    async def disconnect(self, close_code):
+        # Any additional cleanup can go here
+        pass
+    # --------------------websocket disconnect--------------------
+
 
 
 

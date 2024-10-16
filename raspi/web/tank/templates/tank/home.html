@@ -12,6 +12,7 @@
             {% comment %} var water_level={{tank.height}} - djangoData.value; {% endcomment %}
             var water_level=djangoData.value;
             //console.log(water_level);
+            console.log({{time_profile.time_start}});
             
         // document.write("reached here");
 
@@ -51,6 +52,8 @@
         //var chart_type=document.getElementById('chartType').value;
         //var graph_height = {{ tank.height }}
         //console.log("tank height: ",djangoData)
+        data_array=[0, 0, 15, 0, 0, 15, 0, 0, 16, 0]
+        label_array=['none', 'none', 'none', 'none', 'none', 'none', 'none', 'none', 'none', 'none']
         var graphData={
             type: "bar",
             data: {
@@ -74,7 +77,7 @@
                 },
                 animation: {
                         // Duration of the animation in milliseconds
-                        duration: 200,
+                        duration: 20,
 
                         // Easing function for the animation
                         easing: 'linear'
@@ -97,10 +100,10 @@
                 graphData={
                     type: "line",
                     data: {
-                        labels: ['none', 'none', 'none', 'none', 'none', 'none'],
+                        labels: label_array,
                         datasets: [{
                         label: 'water level in cm',
-                        data: [0, 0, 0, 0, 0, 0],
+                        data: data_array,
                         borderWidth: 1
                         }]
                     },
@@ -173,23 +176,178 @@
         {{i.name}}
     {% endfor %} {% endcomment %}
     {{tank.name}}
-    <form action="{% url 'home' %}" method="POST">
-    {% csrf_token %}
-        <table>
-            <tr>
-                <td>Tank Height</td>
-                <td><input type="number" name="height" class="form" placeholder="Vertical size of the Tank" value="{{tank.height}}"></td>
-                <td rowspan=3><input type="submit" class="done-button" value="Done"></td>
-            </tr>
-            <tr>
-                <td>Upper Limit</td>
-                <td><input type="number" name="upper_limit" class="form" placeholder="Fill water upto..." value="{{tank.upper_limit}}"></td>
-            </tr>
-            <tr>
-                <td>Lower Limit</td>
-                <td><input type="number" name="lower_threshold" class="form" placeholder="Start filling when lower than..." value="{{tank.lower_threshold}}"></td>
-            </tr>
-        </table>
-    </form>
+    <style>
+        #container{
+            display:flex;
+        }
+        .box{
+            width:50%;
+            align-items:center;
+            justify-content:center;
+            background:#303030;
+            margin:10px 30px 0px 30px;
+            border-radius:12px;
+        }
+        
+        table {
+            margin: auto; /* Center the table */
+            color: white;
+        }
 
+        th, td {
+            padding: 5px;
+        }
+
+        .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 42px;
+        height: 22px;
+        }
+
+        .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 22px;
+        }
+
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 15px;
+        width: 15px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+        }
+
+        input:checked + .slider {
+        background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+        transform: translateX(18px);
+        }
+
+
+        #time input{
+            width:32px;
+            margin:0px;
+            padding:0px;
+        }
+
+        div#done{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:none;
+            margin:10px 30px 0px 30px;
+            border-radius:20px;
+        }
+
+         .done-button {
+            width: 50px;   /* Set the width */
+            height: 50px;  /* Set the height */
+            border: none;   /* Remove border */
+            background-color: #2196F3; /* Background color */
+            color: white;   /* Text color */
+            font-size: 25px; /* Font size */
+            cursor: pointer; /* Pointer on hover */
+            border-radius: 20%; /* Optional: rounded corners */
+        }
+
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const toggleSwitch = document.querySelector('.toggle-switch input');
+
+        if (toggleSwitch) {
+            toggleSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    console.log('Switch is ON');
+                } else {
+                    console.log('Switch is OFF');
+                }
+            });
+        }
+    });
+    </script>
+
+    <form action="{% url 'home' %}" name="metrics" method="POST" id="metrics">
+        {% csrf_token %}
+        <div id="container">
+            <div class="box">
+                {% comment %} <form action="{% url 'home' %}" name="metrics" method="POST" id="metrics">
+                {% csrf_token %} {% endcomment %}
+                    <table>
+                        <tr>
+                            <td>Tank Height</td>
+                            <td><input type="number" name="height" class="form" placeholder="Vertical size of the Tank" value="{{tank.height}}"></td>
+                            <td rowspan=3>
+                                {% comment %} <input type="submit" class="done-button" value="Done"> {% endcomment %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Upper Limit</td>
+                            <td><input type="number" name="upper_limit" class="form" placeholder="Fill water upto __" value="{{tank.upper_limit}}"></td>
+                        </tr>
+                        <tr>
+                            <td>Lower Limit</td>
+                            <td><input type="number" name="lower_threshold" class="form" placeholder="Start filling from __" value="{{tank.lower_threshold}}"></td>
+                        </tr>
+                    </table>
+                {% comment %} </form> {% endcomment %}
+            </div>
+            <div class="box">
+                {% comment %} <form action="{% url 'home' %}" name="time" method="POST" id="time">
+                {% csrf_token %} {% endcomment %}
+                    <table id="time">
+                        <tr>
+                            {% comment %} <td>Tank Height</td>
+                            <td><input type="number" name="height" class="form" placeholder="Vertical size of the Tank" value="{{tank.height}}"></td>
+                            <td rowspan=3><input type="submit" class="done-button" value="Done"></td> {% endcomment %}
+                            <td align="center" colspan="3">
+                                {{time_profile.name}}
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="is_active" {% if time_profile.is_active %}checked{% endif %}>
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                                
+                        </tr>
+                        <tr>
+                            <td>Start Time</td>
+                            {% comment %} <td><input type="time" name="start_time" class="form" placeholder="Fill water upto __" value="{{time_profile.time_start}}"></td> {% endcomment %}
+                            <td><input type="number" min="0" max="23" name="time_start_h" class="form" placeholder="" value="{{time_profile.time_start_h}}"></td>
+                            <td><input type="number" min="0" max="59" name="time_start_m" class="form" placeholder="" value="{{time_profile.time_start_m}}"></td>
+                        </tr>
+                        <tr>
+                            <td>End Time</td>
+                            {% comment %} <td><input type="time" name="end_time" class="form" placeholder="Start filling from __" value="{{tank.lower_threshold}}"></td> {% endcomment %}
+                            <td><input type="number" min="0" max="23" name="time_end_h" class="form" placeholder="" value="{{time_profile.time_end_h}}"></td>
+                            <td><input type="number" min="0" max="59" name="time_end_m" class="form" placeholder="" value="{{time_profile.time_end_m}}"></td>
+                        </tr>
+                    </table>
+                {% comment %} </form> {% endcomment %}
+            </div>
+            <div id="done">
+                <input type="submit" class="done-button" value="&#10004;">
+            </div>
+        </div>
+    </form>
 {% endblock content %}

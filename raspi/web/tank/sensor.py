@@ -18,6 +18,7 @@ flag_connected = 0
 status="none"
 
 tank_status=old_ts=2
+water_level=0
 
 # FILL=False
 # distance=0
