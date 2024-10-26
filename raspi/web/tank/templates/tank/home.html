@@ -179,19 +179,22 @@
     <style>
         #container{
             display:flex;
+            background:#303030;
+            border-radius:12px;
+
         }
         .box{
             width:50%;
             align-items:center;
             justify-content:center;
-            background:#303030;
-            margin:10px 30px 0px 30px;
+            background:#f1ba9f;
+            margin:10px 20px 10px 20px;
             border-radius:12px;
         }
         
         table {
             margin: auto; /* Center the table */
-            color: white;
+            color: black;
         }
 
         th, td {
@@ -230,7 +233,7 @@
         width: 15px;
         left: 4px;
         bottom: 4px;
-        background-color: white;
+        background-color: #303030;
         transition: .4s;
         border-radius: 50%;
         }
@@ -263,11 +266,11 @@
             width: 50px;   /* Set the width */
             height: 50px;  /* Set the height */
             border: none;   /* Remove border */
-            background-color: #2196F3; /* Background color */
-            color: white;   /* Text color */
+            background-color: #59D57D; /* Background color */
+            color: black;   /* Text color */
             font-size: 25px; /* Font size */
             cursor: pointer; /* Pointer on hover */
-            border-radius: 20%; /* Optional: rounded corners */
+            border-radius: 20%; /* Optional: rounded corners */            
         }
 
     </style>
@@ -276,16 +279,16 @@
         document.addEventListener('DOMContentLoaded', function() {
         const toggleSwitch = document.querySelector('.toggle-switch input');
 
-        if (toggleSwitch) {
-            toggleSwitch.addEventListener('change', function() {
-                if (this.checked) {
-                    console.log('Switch is ON');
-                } else {
-                    console.log('Switch is OFF');
-                }
-            });
-        }
-    });
+            if (toggleSwitch) {
+                toggleSwitch.addEventListener('change', function() {
+                    if (this.checked) {
+                        console.log('Switch is ON');
+                    } else {
+                        console.log('Switch is OFF');
+                    }
+                });
+            }
+        });
     </script>
 
     <form action="{% url 'home' %}" name="metrics" method="POST" id="metrics">
